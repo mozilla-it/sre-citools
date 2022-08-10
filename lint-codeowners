@@ -1,0 +1,44 @@
+#!/usr/bin/env python3
+
+import click
+from pathlib import Path
+
+
+@click.command()
+@click.argument("repo_dir")
+@click.option(
+    "--excludedirs",
+    multiple=True,
+    help="Exclude directories from being linted.",
+)
+def lint_codeowners(repo_dir, excludedirs):
+    repo = Path(repo_dir)
+    dirs_to_check = [d for d in repo.iterdir() if d.is_dir()]
+
+    relative_dirs_to_check = set(
+        [str(d.relative_to(repo)) for d in dirs_to_check]
+    ) - set(excludedirs)
+
+    relative_dirs_to_check = [
+        d for d in relative_dirs_to_check if not str(d).startswith(".")
+    ]
+
+    codeowners = (repo / "CODEOWNERS").read_text()
+    paths_covered = []
+    for line in codeowners.splitlines():
+        line_parts = line.split(maxsplit=1)
+        if len(line_parts) == 2:
+            paths_covered.append(line_parts[0].strip("/"))
+
+    errors = False
+    for d in relative_dirs_to_check:
+        if d not in paths_covered:
+            errors = True
+            print(f"FAIL: {d} not in CODEOWNERS.")
+
+    if errors:
+        exit(1)
+
+
+if __name__ == "__main__":
+    lint_codeowners()
