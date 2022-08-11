@@ -5,8 +5,9 @@ from pathlib import Path
 
 
 class bcolors:
-    OK = '\033[92m'
-    FAIL = '\033[91m'
+    OK = "\033[92m"
+    FAIL = "\033[91m"
+
 
 @click.command()
 @click.argument("repo_dir")
