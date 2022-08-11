@@ -4,6 +4,10 @@ import click
 from pathlib import Path
 
 
+class bcolors:
+    OK = '\033[92m'
+    FAIL = '\033[91m'
+
 @click.command()
 @click.argument("repo_dir")
 @click.option(
@@ -34,10 +38,12 @@ def lint_codeowners(repo_dir, excludedirs):
     for d in relative_dirs_to_check:
         if d not in paths_covered:
             errors = True
-            print(f"FAIL: {d} not in CODEOWNERS.")
+            print(f"{bcolors.FAIL}FAIL: {d} not in CODEOWNERS.")
 
     if errors:
         exit(1)
+    else:
+        print(f"{bcolors.OK}CODEOWNERS OK.")
 
 
 if __name__ == "__main__":
